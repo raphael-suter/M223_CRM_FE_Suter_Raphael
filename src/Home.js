@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Container, ListGroup, Modal, Navbar } from "react-bootstrap";
+import ProjectList from "./ProjectList";
 
 const Home = () => {
   const token = localStorage.getItem("token");
   const [projects, setProjects] = useState([]);
   const [project, setProject] = useState({});
   const [showDialog, setShowDialog] = useState(false);
+  const [standard, setStandard] = useState(localStorage.getItem("standard"));
 
   useEffect(() => {
     if (!token || token.trim() === "") {
@@ -26,6 +28,7 @@ const Home = () => {
           case 401:
             localStorage.removeItem("id");
             localStorage.removeItem("token");
+            localStorage.removeItem("standard");
             window.location.replace("/sign_in");
 
             break;
@@ -49,6 +52,7 @@ const Home = () => {
           case 404:
             localStorage.removeItem("id");
             localStorage.removeItem("token");
+            localStorage.removeItem("standard");
             window.location.replace("/sign_in");
 
             break;
@@ -85,6 +89,11 @@ const Home = () => {
       .catch((error) => alert(error));
   };
 
+  const changeStandard = (id) => {
+    setStandard(id);
+    localStorage.setItem("standard", id);
+  };
+
   return (
     <>
       <Navbar bg="light shadow-sm">
@@ -94,54 +103,31 @@ const Home = () => {
         </Button>
       </Navbar>
       <Container className="py-5">
-        <h2>Meine Projekte</h2>
-        <ListGroup>
-          {projects
-            .filter(
-              ({ employees }) =>
-                employees.filter(({ id }) => id == localStorage.getItem("id"))
-                  .length > 0
-            )
-            .map(({ id, name, description }, index) => (
-              <ListGroup.Item
-                className="d-flex justify-content-between align-items-center"
-                key={index}
-              >
-                <div>
-                  <p className="mb-0">{name}</p>
-                  <p className="mb-0">{description}</p>
-                </div>
-                <Button
-                  variant="outline-info"
-                  size="sm"
-                  onClick={() => loadProject(id)}
-                >
-                  Mehr
-                </Button>
-              </ListGroup.Item>
-            ))}
-        </ListGroup>
+        <h2>Standard Projekt</h2>
+        <ProjectList
+          projects={projects.filter(
+            ({ employees }) =>
+              employees.filter(({ id }) => id == standard).length > 0
+          )}
+          loadProject={loadProject}
+          setStandard={changeStandard}
+        />
+        <h2 className="mt-4">Meine Projekte</h2>
+        <ProjectList
+          projects={projects.filter(
+            ({ employees }) =>
+              employees.filter(({ id }) => id == localStorage.getItem("id"))
+                .length > 0
+          )}
+          loadProject={loadProject}
+          setStandard={changeStandard}
+        />
         <h2 className="mt-4">Projekte</h2>
-        <ListGroup>
-          {projects.map(({ id, name, description }, index) => (
-            <ListGroup.Item
-              className="d-flex justify-content-between align-items-center"
-              key={index}
-            >
-              <div>
-                <p className="mb-0">{name}</p>
-                <p className="mb-0">{description}</p>
-              </div>
-              <Button
-                variant="outline-info"
-                size="sm"
-                onClick={() => loadProject(id)}
-              >
-                Mehr
-              </Button>
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
+        <ProjectList
+          projects={projects}
+          loadProject={loadProject}
+          setStandard={changeStandard}
+        />
         {project && showDialog && (
           <Modal show={true}>
             <Modal.Header>
