@@ -142,7 +142,9 @@ const Home = () => {
                   <ListGroup.Item
                     key={index}
                     className={
-                      id == localStorage.getItem("id") ? "bg-info" : ""
+                      id == localStorage.getItem("id")
+                        ? "bg-info text-light"
+                        : ""
                     }
                   >
                     <p className="mb-0">
