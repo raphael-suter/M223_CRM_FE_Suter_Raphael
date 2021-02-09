@@ -1,16 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { Button, Container } from "react-bootstrap";
 
 const Home = () => {
-  const [message, setMessage] = useState("");
+  const signOut = () => {
+    fetch("http://localhost:8080/api/sign_out", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((response) => {
+        switch (response.status) {
+          case 200:
+          case 404:
+            localStorage.removeItem("token");
+            window.location.replace("/sign_in");
 
-  useEffect(() => {
-    fetch("http://localhost:8080/api/hello")
-      .then((response) => response.json())
-      .then(({ message }) => setMessage(message))
+            break;
+          default:
+            alert("ERROR!");
+        }
+      })
       .catch((error) => alert(error));
-  }, []);
+  };
 
-  return <h1>{message}</h1>;
+  return (
+    <Container>
+      <Button onClick={signOut}>Sign Out</Button>
+    </Container>
+  );
 };
 
 export default Home;

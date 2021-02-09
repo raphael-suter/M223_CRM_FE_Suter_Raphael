@@ -15,15 +15,20 @@ const SignIn = () => {
       body: JSON.stringify({ username, password }),
     })
       .then((response) => {
-        if (response.status === 200) {
-          response.json().then(({ token }) => {
-            localStorage.setItem("token", token);
-            window.location.replace("/");
-          });
-        } else if (response.status === 400 || response.status === 404) {
-          response.json().then(({ message }) => setError(message));
-        } else {
-          alert("ERROR!");
+        switch (response.status) {
+          case 200:
+            response.json().then(({ message }) => {
+              localStorage.setItem("token", message);
+              window.location.replace("/");
+            });
+
+            break;
+          case 400:
+          case 404:
+            response.json().then(({ message }) => setError(message));
+            break;
+          default:
+            alert("ERROR!");
         }
       })
       .catch((error) => alert(error));
