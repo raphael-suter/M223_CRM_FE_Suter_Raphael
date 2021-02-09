@@ -17,8 +17,9 @@ const SignIn = () => {
       .then((response) => {
         switch (response.status) {
           case 200:
-            response.json().then(({ message }) => {
-              localStorage.setItem("token", message);
+            response.json().then(({ id, token }) => {
+              localStorage.setItem("id", id);
+              localStorage.setItem("token", token);
               window.location.replace("/");
             });
 

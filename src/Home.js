@@ -24,6 +24,7 @@ const Home = () => {
             response.json().then((projects) => setProjects(projects));
             break;
           case 401:
+            localStorage.removeItem("id");
             localStorage.removeItem("token");
             window.location.replace("/sign_in");
 
@@ -46,6 +47,7 @@ const Home = () => {
         switch (response.status) {
           case 200:
           case 404:
+            localStorage.removeItem("id");
             localStorage.removeItem("token");
             window.location.replace("/sign_in");
 
@@ -92,7 +94,34 @@ const Home = () => {
         </Button>
       </Navbar>
       <Container className="py-5">
-        <h2>Projekte</h2>
+        <h2>Meine Projekte</h2>
+        <ListGroup>
+          {projects
+            .filter(
+              ({ employees }) =>
+                employees.filter(({ id }) => id == localStorage.getItem("id"))
+                  .length > 0
+            )
+            .map(({ id, name, description }, index) => (
+              <ListGroup.Item
+                className="d-flex justify-content-between align-items-center"
+                key={index}
+              >
+                <div>
+                  <p className="mb-0">{name}</p>
+                  <p className="mb-0">{description}</p>
+                </div>
+                <Button
+                  variant="outline-info"
+                  size="sm"
+                  onClick={() => loadProject(id)}
+                >
+                  Mehr
+                </Button>
+              </ListGroup.Item>
+            ))}
+        </ListGroup>
+        <h2 className="mt-4">Projekte</h2>
         <ListGroup>
           {projects.map(({ id, name, description }, index) => (
             <ListGroup.Item
@@ -123,8 +152,13 @@ const Home = () => {
             </Modal.Header>
             <Modal.Body>
               <ListGroup>
-                {project.employees.map(({ firstname, lastname }, index) => (
-                  <ListGroup.Item key={index}>
+                {project.employees.map(({ id, firstname, lastname }, index) => (
+                  <ListGroup.Item
+                    key={index}
+                    className={
+                      id == localStorage.getItem("id") ? "bg-info" : ""
+                    }
+                  >
                     <p className="mb-0">
                       {firstname} {lastname}
                     </p>
